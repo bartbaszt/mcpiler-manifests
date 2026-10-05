@@ -1,0 +1,56 @@
+{
+  "id": "trilium",
+  "title": "Trilium Notes ETAPI",
+  "summary": "Search, read, create and delete Trilium Notes through the ETAPI token, exposed as a narrow MCP surface with read-only and full-access variants.",
+  "trust": "mcpiler-reviewed",
+  "manifest": {
+    "path": "manifest.json",
+    "formatVersion": "0.3",
+    "parameterized": true
+  },
+  "upstream": {
+    "repository": "https://github.com/TriliumNext/Trilium",
+    "version": "0.105.0",
+    "reviewedRevision": "v0.105.0",
+    "license": "AGPL-3.0",
+    "licenseUrl": "https://github.com/TriliumNext/Trilium/blob/v0.105.0/LICENSE"
+  },
+  "review": {
+    "reviewedBy": "MCPiler maintainer",
+    "reviewedAt": "2026-09-26",
+    "notes": "Compatibility reviewed against Trilium ETAPI in 0.105.0. Operations cover the reviewed ETAPI subset only; the upstream OpenAPI document is not redistributed here."
+  },
+  "secrets": [
+    {
+      "name": "TRILIUM_ETAPI_TOKEN",
+      "source": "fromEnv",
+      "description": "A Trilium ETAPI token created in Options -> ETAPI. Sent as the Authorization bearer for /etapi requests."
+    }
+  ],
+  "materializeInputs": [
+    {
+      "name": "instance-url",
+      "kind": "instance-url",
+      "target": "policy.baseUrl",
+      "example": "https://notes.example.org/etapi"
+    },
+    {
+      "name": "instance-origin",
+      "kind": "instance-url",
+      "target": "policy.allowedOrigins",
+      "example": "https://notes.example.org"
+    }
+  ],
+  "provenance": {
+    "links": [
+      "https://github.com/TriliumNext/Trilium",
+      "https://github.com/TriliumNext/Trilium/releases/tag/v0.105.0"
+    ],
+    "upstreamDocsIncluded": false,
+    "notes": "The Manifest was authored by MCPiler from the reviewed ETAPI behavior; no upstream specification text is copied."
+  },
+  "engineCompatibility": {
+    "inspected": true,
+    "inspectedWith": "MCPiler Engine 0.1.0 inspect"
+  }
+}

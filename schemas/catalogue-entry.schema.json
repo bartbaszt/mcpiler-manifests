@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/bartbaszt/mcpiler-manifests/schemas/catalogue-entry.schema.json",
+  "title": "MCPiler Manifest catalogue entry metadata",
+  "description": "Discovery and governance metadata for one catalogue entry. This is NOT an Engine runtime input: MCPiler Engine never reads catalogue.json. The ordinary Manifest is the runtime artifact.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "title",
+    "trust",
+    "manifest",
+    "upstream",
+    "review",
+    "secrets",
+    "provenance"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "Stable entry id; must match the containing directory name under entries/."
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "summary": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "trust": {
+      "type": "string",
+      "enum": ["mcpiler-reviewed", "community"],
+      "description": "Trust state. Automation MUST NOT promote an entry to mcpiler-reviewed; that requires an explicit MCPiler maintainer review recorded in 'review'."
+    },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "formatVersion"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Path to the ordinary Manifest relative to the entry directory."
+        },
+        "formatVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+$",
+          "description": "MCPiler Manifest format version this entry targets (for example 0.3)."
+        },
+        "parameterized": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true the Manifest is a bounded template that must be materialized before use; materializeInputs MUST then be non-empty."
+        }
+      }
+    },
+    "upstream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "version", "reviewedRevision", "license"],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "pattern": "^https://[^\\s]+$",
+          "description": "Canonical upstream repository URL."
+        },
+        "version": { "type": "string", "minLength": 1 },
+        "reviewedRevision": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Immutable upstream revision (tag, commit or release) the review was performed against."
+        },
+        "license": { "type": "string", "minLength": 1 },
+        "licenseUrl": { "type": "string", "pattern": "^https://[^\\s]+$" }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reviewedBy", "reviewedAt"],
+      "properties": {
+        "reviewedBy": { "type": "string", "minLength": 1 },
+        "reviewedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "notes": { "type": "string" }
+      }
+    },
+    "secrets": {
+      "type": "array",
+      "description": "User-supplied secret references declared by the Manifest. Names only; never values.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "source", "description"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "description": "Environment variable name a fromEnv reference reads (or a stable label for a fromFile reference)."
+          },
+          "source": { "type": "string", "enum": ["fromEnv", "fromFile"] },
+          "description": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "materializeInputs": {
+      "type": "array",
+      "description": "Bounded, non-secret inputs the materializer may apply. The only supported kind is an absolute instance URL.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "kind", "target"],
+        "properties": {
+          "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "kind": { "type": "string", "enum": ["instance-url"] },
+          "target": {
+            "type": "string",
+            "enum": ["policy.baseUrl", "policy.allowedOrigins"],
+            "description": "The only Manifest members the materializer may rewrite."
+          },
+          "example": { "type": "string" }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["links"],
+      "properties": {
+        "links": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "pattern": "^https://[^\\s]+$" }
+        },
+        "upstreamDocsIncluded": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether any upstream specification/documentation text is included verbatim. Must be false unless a compatible treatment is recorded."
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "engineCompatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["inspected"],
+      "properties": {
+        "inspected": {
+          "type": "boolean",
+          "description": "Whether Engine inspect was run against the materialized Manifest during review."
+        },
+        "inspectedWith": { "type": "string" }
+      }
+    }
+  }
+}

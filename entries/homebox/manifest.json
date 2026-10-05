@@ -1,0 +1,428 @@
+{
+  "manifestFormatVersion": "0.3",
+  "sections": {
+    "server": {
+      "inline": {
+        "name": "Homebox",
+        "description": "A narrow MCP surface over the Homebox home-inventory REST API.",
+        "surfaces": [
+          {
+            "slug": "read-only",
+            "name": "Homebox read only",
+            "isDefault": true,
+            "operations": [
+              { "operation": "app-info", "exposure": "direct" },
+              { "operation": "get-currency", "exposure": "direct" },
+              { "operation": "search-entities", "exposure": "direct" },
+              { "operation": "get-entity", "exposure": "direct" },
+              { "operation": "list-entity-types", "exposure": "direct" },
+              { "operation": "list-tags", "exposure": "direct" },
+              { "operation": "list-groups", "exposure": "direct" },
+              { "operation": "get-self", "exposure": "direct" },
+              { "operation": "create-entity", "exposure": "hidden" },
+              { "operation": "update-entity", "exposure": "hidden" },
+              { "operation": "delete-entity", "exposure": "hidden" }
+            ],
+            "requiredScopes": [
+              "homebox.read"
+            ]
+          },
+          {
+            "slug": "full",
+            "name": "Homebox full access",
+            "operations": [
+              { "operation": "app-info", "exposure": "direct" },
+              { "operation": "get-currency", "exposure": "direct" },
+              { "operation": "search-entities", "exposure": "direct" },
+              { "operation": "get-entity", "exposure": "direct" },
+              { "operation": "list-entity-types", "exposure": "direct" },
+              { "operation": "list-tags", "exposure": "direct" },
+              { "operation": "list-groups", "exposure": "direct" },
+              { "operation": "get-self", "exposure": "direct" },
+              { "operation": "create-entity", "exposure": "direct" },
+              { "operation": "update-entity", "exposure": "direct" },
+              { "operation": "delete-entity", "exposure": "direct" }
+            ],
+            "requiredScopes": [
+              "homebox.read",
+              "homebox.write"
+            ]
+          }
+        ],
+        "authenticationRequired": true
+      }
+    },
+    "policy": {
+      "inline": {
+        "baseUrl": "https://homebox.example.com/api",
+        "allowedOrigins": [
+          "https://homebox.example.com"
+        ]
+      }
+    },
+    "operations": {
+      "inline": {
+        "operations": [
+          {
+            "key": "GET /v1/status",
+            "method": "GET",
+            "path": "/v1/status",
+            "summary": "Homebox application info and status",
+            "responses": {
+              "200": {
+                "content": {
+                  "application/json": {
+                    "schema": { "type": "object" }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "key": "GET /v1/currency",
+            "method": "GET",
+            "path": "/v1/currency",
+            "summary": "Currency configuration of the instance",
+            "responses": {
+              "200": {
+                "content": {
+                  "application/json": {
+                    "schema": { "type": "object" }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "key": "GET /v1/entities",
+            "method": "GET",
+            "path": "/v1/entities",
+            "summary": "Query entities (items and locations)",
+            "parameters": [
+              { "name": "q", "in": "query", "schema": { "type": "string" } },
+              { "name": "page", "in": "query", "schema": { "type": "integer", "minimum": 1 } },
+              { "name": "pageSize", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100 } }
+            ],
+            "responses": {
+              "200": {
+                "content": {
+                  "application/json": {
+                    "schema": { "type": "object" }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "key": "GET /v1/entities/{id}",
+            "method": "GET",
+            "path": "/v1/entities/{id}",
+            "summary": "Get one entity by identifier",
+            "parameters": [
+              { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+            ],
+            "responses": {
+              "200": {
+                "content": {
+                  "application/json": {
+                    "schema": { "type": "object" }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "key": "POST /v1/entities",
+            "method": "POST",
+            "path": "/v1/entities",
+            "summary": "Create an entity (item or location)",
+            "requestBody": {
+              "required": true,
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "required": ["name"],
+                    "properties": {
+                      "name": { "type": "string" },
+                      "description": { "type": "string" },
+                      "quantity": { "type": "number" },
+                      "parentId": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            },
+            "responses": {
+              "201": {
+                "content": {
+                  "application/json": {
+                    "schema": { "type": "object" }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "key": "PUT /v1/entities/{id}",
+            "method": "PUT",
+            "path": "/v1/entities/{id}",
+            "summary": "Update an entity by identifier",
+            "parameters": [
+              { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+            ],
+            "requestBody": {
+              "required": true,
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "required": ["name"],
+                    "properties": {
+                      "name": { "type": "string" },
+                      "description": { "type": "string" },
+                      "quantity": { "type": "number" }
+                    }
+                  }
+                }
+              }
+            },
+            "responses": {
+              "200": {
+                "content": {
+                  "application/json": {
+                    "schema": { "type": "object" }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "key": "DELETE /v1/entities/{id}",
+            "method": "DELETE",
+            "path": "/v1/entities/{id}",
+            "summary": "Delete an entity by identifier",
+            "parameters": [
+              { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+            ],
+            "responses": {
+              "204": { "description": "Deleted" }
+            }
+          },
+          {
+            "key": "GET /v1/entity-types",
+            "method": "GET",
+            "path": "/v1/entity-types",
+            "summary": "List the entity types defined in the group",
+            "responses": {
+              "200": {
+                "content": {
+                  "application/json": {
+                    "schema": { "type": "array", "items": { "type": "object" } }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "key": "GET /v1/tags",
+            "method": "GET",
+            "path": "/v1/tags",
+            "summary": "List the tags defined in the group",
+            "responses": {
+              "200": {
+                "content": {
+                  "application/json": {
+                    "schema": { "type": "array", "items": { "type": "object" } }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "key": "GET /v1/groups",
+            "method": "GET",
+            "path": "/v1/groups",
+            "summary": "List the groups visible to the caller",
+            "responses": {
+              "200": {
+                "content": {
+                  "application/json": {
+                    "schema": { "type": "array", "items": { "type": "object" } }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "key": "GET /v1/users/self",
+            "method": "GET",
+            "path": "/v1/users/self",
+            "summary": "Get the authenticated user",
+            "responses": {
+              "200": {
+                "content": {
+                  "application/json": {
+                    "schema": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "agentSurface": {
+      "inline": {
+        "operations": [
+          {
+            "slug": "app-info",
+            "name": "App info",
+            "summary": "Returns the Homebox application summary and service status",
+            "inputSchema": { "type": "object", "properties": {} },
+            "annotations": { "readOnly": true, "destructive": false, "idempotent": true, "openWorld": false },
+            "risk": "readOnly",
+            "binding": { "type": "http", "operation": "GET /v1/status", "credentialRef": ["homebox-token"] }
+          },
+          {
+            "slug": "get-currency",
+            "name": "Get currency",
+            "summary": "Returns the currency configuration of the instance",
+            "inputSchema": { "type": "object", "properties": {} },
+            "annotations": { "readOnly": true, "destructive": false, "idempotent": true, "openWorld": false },
+            "risk": "readOnly",
+            "binding": { "type": "http", "operation": "GET /v1/currency", "credentialRef": ["homebox-token"] }
+          },
+          {
+            "slug": "search-entities",
+            "name": "Search entities",
+            "summary": "Returns a page of entities matching the search string",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "q": { "type": "string" },
+                "page": { "type": "integer", "minimum": 1 },
+                "pageSize": { "type": "integer", "minimum": 1, "maximum": 100 }
+              }
+            },
+            "annotations": { "readOnly": true, "destructive": false, "idempotent": true, "openWorld": false },
+            "risk": "readOnly",
+            "binding": { "type": "http", "operation": "GET /v1/entities", "credentialRef": ["homebox-token"] }
+          },
+          {
+            "slug": "get-entity",
+            "name": "Get entity",
+            "summary": "Returns one entity by identifier",
+            "inputSchema": {
+              "type": "object",
+              "required": ["id"],
+              "properties": { "id": { "type": "string" } }
+            },
+            "annotations": { "readOnly": true, "destructive": false, "idempotent": true, "openWorld": false },
+            "risk": "readOnly",
+            "binding": { "type": "http", "operation": "GET /v1/entities/{id}", "credentialRef": ["homebox-token"] }
+          },
+          {
+            "slug": "list-entity-types",
+            "name": "List entity types",
+            "summary": "Lists the entity types defined in the group",
+            "inputSchema": { "type": "object", "properties": {} },
+            "annotations": { "readOnly": true, "destructive": false, "idempotent": true, "openWorld": false },
+            "risk": "readOnly",
+            "binding": { "type": "http", "operation": "GET /v1/entity-types", "credentialRef": ["homebox-token"] }
+          },
+          {
+            "slug": "list-tags",
+            "name": "List tags",
+            "summary": "Lists the tags defined in the group",
+            "inputSchema": { "type": "object", "properties": {} },
+            "annotations": { "readOnly": true, "destructive": false, "idempotent": true, "openWorld": false },
+            "risk": "readOnly",
+            "binding": { "type": "http", "operation": "GET /v1/tags", "credentialRef": ["homebox-token"] }
+          },
+          {
+            "slug": "list-groups",
+            "name": "List groups",
+            "summary": "Lists the groups visible to the caller",
+            "inputSchema": { "type": "object", "properties": {} },
+            "annotations": { "readOnly": true, "destructive": false, "idempotent": true, "openWorld": false },
+            "risk": "readOnly",
+            "binding": { "type": "http", "operation": "GET /v1/groups", "credentialRef": ["homebox-token"] }
+          },
+          {
+            "slug": "get-self",
+            "name": "Get current user",
+            "summary": "Returns the authenticated Homebox user",
+            "inputSchema": { "type": "object", "properties": {} },
+            "annotations": { "readOnly": true, "destructive": false, "idempotent": true, "openWorld": false },
+            "risk": "readOnly",
+            "binding": { "type": "http", "operation": "GET /v1/users/self", "credentialRef": ["homebox-token"] }
+          },
+          {
+            "slug": "create-entity",
+            "name": "Create entity",
+            "summary": "Creates a new item or location",
+            "inputSchema": {
+              "type": "object",
+              "required": ["name"],
+              "properties": {
+                "name": { "type": "string" },
+                "description": { "type": "string" },
+                "quantity": { "type": "number" },
+                "parentId": { "type": "string" }
+              }
+            },
+            "annotations": { "readOnly": false, "destructive": false, "idempotent": false, "openWorld": false },
+            "risk": "mutating",
+            "binding": { "type": "http", "operation": "POST /v1/entities", "credentialRef": ["homebox-token"] }
+          },
+          {
+            "slug": "update-entity",
+            "name": "Update entity",
+            "summary": "Updates an entity by identifier",
+            "inputSchema": {
+              "type": "object",
+              "required": ["id", "name"],
+              "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" },
+                "description": { "type": "string" },
+                "quantity": { "type": "number" }
+              }
+            },
+            "annotations": { "readOnly": false, "destructive": false, "idempotent": true, "openWorld": false },
+            "risk": "mutating,idempotent",
+            "binding": { "type": "http", "operation": "PUT /v1/entities/{id}", "credentialRef": ["homebox-token"] }
+          },
+          {
+            "slug": "delete-entity",
+            "name": "Delete entity",
+            "summary": "Deletes one entity by identifier",
+            "inputSchema": {
+              "type": "object",
+              "required": ["id"],
+              "properties": { "id": { "type": "string" } }
+            },
+            "annotations": { "readOnly": false, "destructive": true, "idempotent": true, "openWorld": false },
+            "risk": "destructive,mutating,idempotent",
+            "binding": { "type": "http", "operation": "DELETE /v1/entities/{id}", "credentialRef": ["homebox-token"] }
+          }
+        ]
+      }
+    },
+    "credentials": {
+      "inline": {
+        "credentials": [
+          {
+            "id": "homebox-token",
+            "scheme": "bearer",
+            "slot": "Authorization",
+            "value": {
+              "fromEnv": "HOMEBOX_TOKEN"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

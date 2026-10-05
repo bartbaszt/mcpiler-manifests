@@ -1,0 +1,56 @@
+{
+  "id": "homebox",
+  "title": "Homebox",
+  "summary": "Browse and manage home-inventory items, locations, tags and entity types through the Homebox REST API, exposed as a narrow MCP surface with read-only and full-access variants.",
+  "trust": "mcpiler-reviewed",
+  "manifest": {
+    "path": "manifest.json",
+    "formatVersion": "0.3",
+    "parameterized": true
+  },
+  "upstream": {
+    "repository": "https://github.com/sysadminsmedia/homebox",
+    "version": "0.26.2",
+    "reviewedRevision": "v0.26.2",
+    "license": "AGPL-3.0",
+    "licenseUrl": "https://github.com/sysadminsmedia/homebox/blob/v0.26.2/LICENSE"
+  },
+  "review": {
+    "reviewedBy": "MCPiler maintainer",
+    "reviewedAt": "2026-08-31",
+    "notes": "Compatibility reviewed against the Homebox REST API in 0.26.2. Operations cover the reviewed subset only; the upstream OpenAPI document is not redistributed here."
+  },
+  "secrets": [
+    {
+      "name": "HOMEBOX_TOKEN",
+      "source": "fromEnv",
+      "description": "A Homebox API key created under the user's profile (normally prefixed 'hb_'). Sent as the Authorization bearer for /api requests."
+    }
+  ],
+  "materializeInputs": [
+    {
+      "name": "instance-url",
+      "kind": "instance-url",
+      "target": "policy.baseUrl",
+      "example": "https://inventory.example.org/api"
+    },
+    {
+      "name": "instance-origin",
+      "kind": "instance-url",
+      "target": "policy.allowedOrigins",
+      "example": "https://inventory.example.org"
+    }
+  ],
+  "provenance": {
+    "links": [
+      "https://github.com/sysadminsmedia/homebox",
+      "https://github.com/sysadminsmedia/homebox/releases/tag/v0.26.2"
+    ],
+    "upstreamDocsIncluded": false,
+    "notes": "The Manifest was authored by MCPiler from the reviewed API behaviour; no upstream specification text is copied."
+  },
+  "engineCompatibility": {
+    "inspected": true,
+    "inspectedWith": "MCPiler Engine 0.1.0 inspect"
+  }
+}

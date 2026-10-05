@@ -1,0 +1,85 @@
+name: catalogue
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: catalogue-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate catalogue
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install validation dependencies
+        run: python3 -m pip install --no-cache-dir 'jsonschema>=4.18'
+
+      - name: Validate metadata, Manifest, secrets and materialization
+        run: python3 tools/validate.py
+
+      - name: Materializer tests
+        run: python3 tests/test_materialize.py
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Download MCPiler Engine release
+        env:
+          ENGINE_RELEASE: ${{ vars.MCPILER_ENGINE_RELEASE }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${ENGINE_RELEASE:-}" ]]; then
+            echo "MCPILER_ENGINE_RELEASE is not configured; skipping Engine inspect gate" >&2
+            exit 0
+          fi
+          mkdir -p engine
+          curl --fail --location --silent --show-error \
+            "https://github.com/bartbaszt/mcpiler-engine/releases/download/${ENGINE_RELEASE}/mcpiler-engine-linux-x64.zip" \
+            --output engine/engine.zip
+          unzip -q engine/engine.zip -d engine
+          echo "MCPILER_ENGINE_DLL=$(find engine -name 'mcpiler-engine.dll' | head -n1)" >> "$GITHUB_ENV"
+
+      - name: Engine inspect on materialized entries
+        if: env.MCPILER_ENGINE_DLL != ''
+        run: bash tools/validate.sh --engine "$MCPILER_ENGINE_DLL"
+
+  dco:
+    name: DCO sign-off
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Every commit carries a DCO sign-off
+        run: |
+          set -euo pipefail
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          missing=0
+          while read -r commit; do
+            author="$(git log -1 --format='%an <%ae>' "$commit")"
+            if ! git log -1 --format='%B' "$commit" | grep -qF "Signed-off-by: $author"; then
+              echo "commit $commit is missing a DCO sign-off by $author" >&2
+              missing=1
+            fi
+          done < <(git rev-list "$base..$head")
+          exit $missing

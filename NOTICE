@@ -1,0 +1,21 @@
+MCPiler Manifest Catalogue
+Copyright 2026 Bartłomiej Basztura
+
+This repository contains MCPiler-authored catalogue metadata, Manifest examples, original
+documentation and tooling developed as part of the MCPiler project.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this software except in compliance with the License. You may obtain a copy of
+the License in the LICENSE file distributed with this work, or at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Some entries reference or are derived from third-party upstream projects. Those projects,
+their licenses and the exact reviewed revisions are recorded in each entry's catalogue.json
+and README.md. Upstream openapi/swagger documents are NOT redistributed here; entries document
+their provenance instead.
+
+"MCPiler", "MCPiler Studio", "MCPiler Engine", the MCPiler name in any combination, and the
+MCPiler logo are marks of the project owner. The Apache License, Version 2.0 does not grant
+permission to use the project's trade names, trademarks, service marks, or product names.
+See TRADEMARKS.md.

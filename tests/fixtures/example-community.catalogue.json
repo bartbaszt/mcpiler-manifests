@@ -1,0 +1,46 @@
+{
+  "id": "example-community",
+  "title": "Example community entry",
+  "summary": "A minimal, structural example used by the materializer tests. It is never a reviewed entry.",
+  "trust": "community",
+  "manifest": {
+    "path": "manifest.json",
+    "formatVersion": "0.3",
+    "parameterized": true
+  },
+  "upstream": {
+    "repository": "https://github.com/example/example-api",
+    "version": "1.0.0",
+    "reviewedRevision": "v1.0.0",
+    "license": "MIT"
+  },
+  "review": {
+    "reviewedBy": "example",
+    "reviewedAt": "2026-01-01"
+  },
+  "secrets": [
+    {
+      "name": "EXAMPLE_API_TOKEN",
+      "source": "fromEnv",
+      "description": "Example bearer token."
+    }
+  ],
+  "materializeInputs": [
+    {
+      "name": "instance-url",
+      "kind": "instance-url",
+      "target": "policy.baseUrl",
+      "example": "https://api.example.org"
+    },
+    {
+      "name": "instance-origin",
+      "kind": "instance-url",
+      "target": "policy.allowedOrigins",
+      "example": "https://api.example.org"
+    }
+  ],
+  "provenance": {
+    "links": ["https://github.com/example/example-api"],
+    "upstreamDocsIncluded": false
+  }
+}
