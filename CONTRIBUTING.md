@@ -110,6 +110,19 @@ compatibility review MUST NOT retain `mcpiler-reviewed`.
 
 ## Quality gates
 
+Install BetterLeaks 1.9.0 and enable the repo-local pre-commit hook once:
+
+```bash
+git config --local core.hooksPath .githooks
+```
+
+The hook scans staged changes with `bash tools/check-secrets.sh --staged`.
+Run `bash tools/check-secrets.sh --history` to scan the entire Git history.
+GitHub Actions runs the full scan for each PR and push to main, using the
+checksum-pinned scanner. Output redacts detected secrets and performs no
+online validation. The existing `tools/validate.sh` still checks the JSON
+structure and forbidden inline credential channels; both gates are required.
+
 ```bash
 # metadata + Manifest + secret scan + materialization + inspect
 bash tools/validate.sh

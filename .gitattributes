@@ -4,6 +4,7 @@
 
 # Executable/scripts and tooling.
 *.sh text eol=lf
+.githooks/* text eol=lf
 *.py text eol=lf
 
 # Manifests and metadata are inspected by Engine and validated by tools whose output must be
